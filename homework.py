@@ -1,4 +1,5 @@
 from dataclasses import asdict, dataclass
+from typing import Dict, List
 
 MIN_IN_H = 60
 
@@ -158,9 +159,9 @@ class Swimming(Training):
         return spent_calories
 
 
-def read_package(workout_type: str, data: list[int]) -> Training:
+def read_package(workout_type: str, data: List[int]) -> Training:
     """Прочитать данные полученные от датчиков."""
-    workout_dict: dict[str, Training] = {
+    workout_dict: Dict[str, Training] = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking

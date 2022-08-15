@@ -30,7 +30,10 @@ class InfoMessage:
     )
 
     def get_message(self, info_message: str = default_message) -> str:
-        return info_message.format(**asdict(self))
+        try:
+            return info_message.format(**asdict(self))
+        except Exception:
+            print('Невозможно отформатировать строку')
 
 
 @dataclass
@@ -64,7 +67,6 @@ class Training:
             'Метод get_spent_calories обязательно'
             'должен быть переопределен в дочерних классах'
         )
-        pass
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -92,8 +94,7 @@ class Running(Training):
             / self.M_IN_KM
         )
         duration_min = self.duration * MIN_IN_H
-        spent_calories = specific_calories * self.weight * duration_min
-        return spent_calories
+        return specific_calories * self.weight * duration_min
 
 
 @dataclass
@@ -118,12 +119,11 @@ class SportsWalking(Training):
             + mean_speed**2 // self.height
             * self.COEFF_CALORIE_2 * self.weight
         )
-        spent_calories = (
+        return (
             specific_calories
             * self.duration
             * MIN_IN_H
         )
-        return spent_calories
 
 
 @dataclass
@@ -145,18 +145,16 @@ class Swimming(Training):
     def get_mean_speed(self) -> float:
         """Получить среднюю скорость движения."""
         length = self.length_pool * self.count_pool
-        mean_speed = length / self.M_IN_KM / self.duration
-        return mean_speed
+        return length / self.M_IN_KM / self.duration
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
         average_speed = self.get_mean_speed()
-        spent_calories = (
+        return (
             (average_speed + self.COEFF_CALORIE_1)
             * self.COEFF_CALORIE_2
             * self.weight
         )
-        return spent_calories
 
 
 def read_package(workout_type: str, data: List[int]) -> Training:
@@ -166,7 +164,15 @@ def read_package(workout_type: str, data: List[int]) -> Training:
         'RUN': Running,
         'WLK': SportsWalking
     }
-    return workout_dict[workout_type](*data)
+    try:
+        return workout_dict[workout_type](*data)
+    except KeyError:
+        print(
+            f'{workout_type} - неизвестный тип тренировки.'
+            f'workout_type может включать'
+            f'только следующие виды тренировок:'
+            f'"SWM", "RUN", "WLK"'
+        )
 
 
 def main(training: Training) -> None:
@@ -183,13 +189,5 @@ if __name__ == '__main__':
     ]
 
     for workout_type, data in packages:
-        try:
-            training = read_package(workout_type, data)
-        except KeyError:
-            print(
-                f'{workout_type} - неизвестный тип тренировки.'
-                f'workout_type может включать'
-                f'только следующие виды тренировок:'
-                f'"SWM", "RUN", "WLK"'
-            )
+        training = read_package(workout_type, data)
         main(training)

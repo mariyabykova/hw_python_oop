@@ -32,7 +32,7 @@ class InfoMessage:
     def get_message(self, info_message: str = default_message) -> str:
         try:
             return info_message.format(**asdict(self))
-        except:
+        except Exception:
             raise Exception('Невозможно отформатировать строку')
 
 

@@ -32,8 +32,8 @@ class InfoMessage:
     def get_message(self, info_message: str = default_message) -> str:
         try:
             return info_message.format(**asdict(self))
-        except Exception:
-            print('Невозможно отформатировать строку')
+        except:
+            raise Exception('Невозможно отформатировать строку')
 
 
 @dataclass
@@ -119,11 +119,7 @@ class SportsWalking(Training):
             + mean_speed**2 // self.height
             * self.COEFF_CALORIE_2 * self.weight
         )
-        return (
-            specific_calories
-            * self.duration
-            * MIN_IN_H
-        )
+        return specific_calories * self.duration * MIN_IN_H
 
 
 @dataclass
@@ -167,12 +163,7 @@ def read_package(workout_type: str, data: List[int]) -> Training:
     try:
         return workout_dict[workout_type](*data)
     except KeyError:
-        print(
-            f'{workout_type} - неизвестный тип тренировки.'
-            f'workout_type может включать'
-            f'только следующие виды тренировок:'
-            f'"SWM", "RUN", "WLK"'
-        )
+        raise KeyError(f'{workout_type} - неизвестный тип тренировки.')
 
 
 def main(training: Training) -> None:
